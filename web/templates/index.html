@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Football Stats</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div id="leaguesGrid" class="row g-3"></div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-12 text-end">
+            <label for="seasonSelect" class="me-2">Season:</label>
+            <select id="seasonSelect" class="form-select d-inline-block w-auto">
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Top 10 Teams</h4>
+            <table id="topTeamsTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Team</th>
+                        <th>Avg Points/Game</th>
+                        <th>Avg Goals/Game</th>
+                        <th>Avg Goals Against</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h4>Top 10 Players</h4>
+            <table id="topPlayersTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Player</th>
+                        <th>Points (G+A)</th>
+                        <th>Goals</th>
+                        <th>Assists</th>
+                        <th>Avg Points Time min/p</th>
+                        <th>Avg Goal Time min/g</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

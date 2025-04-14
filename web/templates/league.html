@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>League Matches</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-4">
+        <!-- Иконка и название лиги -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-3 text-center text-md-start">
+                <img id="leagueIcon" src="" style="width:48px;" class="me-2">
+                <span id="leagueName"></span>
+            </div>
+            <!-- Сезон -->
+            <div class="col-md-6 text-center">
+                <h3>Matches for Season <span id="seasonYear"></span></h3>
+            </div>
+            <!-- Выбор сезона -->
+            <div class="col-md-3 text-end">
+                <label for="seasonSelect" class="me-2">Season:</label>
+                <select id="seasonSelect" class="form-select d-inline-block w-auto"></select>
+            </div>
+        </div>
+
+        <div id="matchesList" class="row mt-1"></div>
+        <div class="d-flex justify-content-center mt-3">
+            <button id="prevPage" class="btn btn-secondary me-2">Previous</button>
+            <button id="nextPage" class="btn btn-primary">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const leagueID = urlParams.get('id');
+        let currentSeason = urlParams.get('season') || '2023';
+        let currentPage = parseInt(urlParams.get('page')) || 1;
+
+        // Загрузка сезонов
+        async function loadSeasons() {
+            const response = await fetch('/api/seasons');
+            const seasons = await response.json();
+            const seasonSelect = document.getElementById('seasonSelect');
+
+            seasons.forEach(season => {
+                const option = document.createElement('option');
+                option.value = season.value;
+                option.textContent = season.label;
+                seasonSelect.appendChild(option);
+            });
+
+            seasonSelect.value = currentSeason;
+        }
+
+        async function loadMatches() {
+            const response = await fetch(`/api/matches?league_id=${leagueID}&season=${currentSeason}&page=${currentPage}&limit=10`);
+            const data = await response.json();
+
+            // Устанавливаем данные лиги
+            document.getElementById('leagueIcon').src = data.league.icon;
+            document.getElementById('leagueName').textContent = data.league.name;
+
+            // Форматируем сезон
+            document.getElementById('seasonYear').textContent = formatSeason(currentSeason);
+
+            const matchesList = document.getElementById('matchesList');
+            matchesList.innerHTML = '';
+
+            if (!data.matches || data.matches.length === 0) {
+                matchesList.innerHTML = '<p class="col-12">No matches available.</p>';
+                return;
+            }
+
+            // Группируем матчи по дате
+            const matchesByDate = data.matches.reduce((acc, match) => {
+                const date = match.date.split('T')[0];
+                acc[date] = acc[date] || [];
+                acc[date].push(match);
+                return acc;
+            }, {});
+
+            const sortedDates = Object.keys(matchesByDate).sort((a, b) => new Date(b) - new Date(a));
+
+            sortedDates.forEach(date => {
+                // Контейнер для даты
+                const dateContainer = document.createElement('div');
+                dateContainer.className = 'col-12 mb-3';
+                dateContainer.innerHTML = `<h5 class="bg-light p-2">${date}</h5>`;
+
+                // Контейнер для матчей в два столбца
+                const matchesContainer = document.createElement('div');
+                matchesContainer.className = 'row';
+
+                matchesByDate[date].forEach(match => {
+                    const time = match.time; // ← Используем поле time
+                    const matchCard = `
+                        <div class="col-12 col-md-6 mb-2">
+                            <div class="card">
+                                <div class="card-body d-flex justify-content-between align-items-center">
+                                    <div class="text-muted">${time}</div>
+                                    <div>
+                                        <img src="${match.home_icon}" class="me-2" style="width:24px;">
+                                        ${match.home_team}
+                                    </div>
+                                    
+                                    <div>
+                                        <img src="${match.away_icon}" class="me-2" style="width:24px;">
+                                        ${match.away_team}
+                                    </div>
+                                    <div class="fw-bold">${match.home_score} - ${match.away_score}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    matchesContainer.innerHTML += matchCard;
+                });
+
+                matchesList.appendChild(dateContainer);
+                matchesList.appendChild(matchesContainer);
+            });
+        }
+
+        // Пагинация
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                loadMatches();
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            currentPage++;
+            loadMatches();
+        });
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadSeasons();
+            loadMatches();
+        });
+
+        function formatSeason(season) {
+            if (season.length === 4) {
+                return `${season}/${parseInt(season.slice(2)) + 1}`;
+            }
+            return season;
+        }
+    </script>
+</body>
+
+</html>

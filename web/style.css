@@ -1,0 +1,51 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.card {
+    transition: all 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+    height: 100px;
+    width: 100px;
+    object-fit: contain;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.form-square {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    margin: 2px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.form-square.W {
+    background-color: #28a745;
+    color: white;
+}
+
+.form-square.D {
+    background-color: #ffc107;
+    color: white;
+}
+
+.form-square.L {
+    background-color: #dc3545;
+    color: white;
+}
+
+.team-icon {
+    vertical-align: middle;
+    margin-right: 8px;
+}
